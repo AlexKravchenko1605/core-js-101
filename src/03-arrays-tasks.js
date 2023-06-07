@@ -142,7 +142,7 @@ function getStringsLength(arr) {
  *    [ 1, 'b', 'c'], 'x', 0  => [ 'x', 1, 'b', 'c' ]
  */
 function insertItem(arr, item, index) {
-  arr.splice(index, 0, item);
+  return arr.splice(index, 0, item);
 }
 
 /**
@@ -521,8 +521,22 @@ function distinct(arr) {
  *    "Poland" => ["Lodz"]
  *   }
  */
-function group(/* array, keySelector, valueSelector */) {
-  throw new Error('Not implemented');
+function group(array, keySelector, valueSelector) {
+  const res = {};
+
+  array.map((item) => {
+    if (!Object.keys(res).includes(keySelector(item))) {
+      res[keySelector(item)] = [];
+    }
+    return 1;
+  });
+  array.map((item) => {
+    if (Object.keys(res).includes(keySelector(item))) {
+      res[keySelector(item)].push(valueSelector(item));
+    }
+    return 2;
+  });
+  return new Map(Object.entries(res));
 }
 
 /**
@@ -538,8 +552,8 @@ function group(/* array, keySelector, valueSelector */) {
  *   [[1, 2], [3, 4], [5, 6]], (x) => x     =>   [ 1, 2, 3, 4, 5, 6 ]
  *   ['one','two','three'], (x) => x.split('')  =>   ['o','n','e','t','w','o','t','h','r','e','e']
  */
-function selectMany(/* arr, childrenSelector */) {
-  throw new Error('Not implemented');
+function selectMany(arr, childrenSelector) {
+  return arr.reduce((prev, curr) => prev.concat(childrenSelector(curr)), []);
 }
 
 /**
@@ -554,8 +568,14 @@ function selectMany(/* arr, childrenSelector */) {
  *   ['one','two','three'], [2]       => 'three'  (arr[2])
  *   [[[ 1, 2, 3]]], [ 0, 0, 1 ]      => 2        (arr[0][0][1])
  */
-function getElementByIndexes(/* arr, indexes */) {
-  throw new Error('Not implemented');
+function getElementByIndexes(arr, indexes) {
+  if (indexes.length === 1) {
+    return arr[indexes[0]];
+  }
+
+  const arr1 = arr[indexes[0]];
+  indexes.shift(0);
+  return getElementByIndexes(arr1, indexes);
 }
 
 /**
@@ -576,8 +596,17 @@ function getElementByIndexes(/* arr, indexes */) {
  *   [ 1, 2, 3, 4, 5, 6, 7, 8 ]   =>  [ 5, 6, 7, 8, 1, 2, 3, 4 ]
  *
  */
-function swapHeadAndTail(/* arr */) {
-  throw new Error('Not implemented');
+function swapHeadAndTail(arr) {
+  const slicePart = Math.floor(arr.length / 2);
+  if (arr.length % 2 === 0) {
+    const head = arr.slice(0, slicePart);
+    const tail = arr.slice(slicePart);
+    return [...tail, ...head];
+  }
+
+  const head = arr.slice(0, slicePart);
+  const tail = arr.slice(slicePart + 1);
+  return [...tail, arr[slicePart], ...head];
 }
 
 module.exports = {
